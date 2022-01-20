@@ -38,16 +38,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-import org.json.XML;
-import org.json.XMLParserConfiguration;
-import org.json.XMLXsiTypeConverter;
+import org.json.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -1068,5 +1063,71 @@ public class XMLTest {
             });
             fail("Expected to be unable to modify the config");
         } catch (Exception ignored) { }
+    }
+
+    @Test
+    public void testToJSONObjectWithPath() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "  </address>\n" +
+                "</contact>";
+        String expectedString = "{\"street\":\"Ave of Nowhere\"}";
+
+        try {
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street"));
+            Util.compareActualVsExpectedJsonObjects(jobj, new JSONObject(expectedString));
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void testToJSONObjectWithPath2() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "  </address>\n" +
+                "</contact>";
+        String expectedString = "{\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"}}";
+
+        try {
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address"));
+            Util.compareActualVsExpectedJsonObjects(jobj, new JSONObject(expectedString));
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void testToJSONObjectWithPathWithReplacement() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "  </address>\n" +
+                "</contact>";
+
+        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":{\"street\":\"Ave of the Arts\"}},\"name\":\"Crista Lopes\"}}";
+
+        try {
+            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
+            //System.out.println("Given replacement: " + replacement);
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
+            Util.compareActualVsExpectedJsonObjects(jobj, new JSONObject(expectedString));
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
     }
 }

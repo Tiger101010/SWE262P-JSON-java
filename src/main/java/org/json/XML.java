@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Iterator;
 
 
@@ -240,7 +241,6 @@ public class XML {
             }
         }
     }
-
     /**
      * Scan the content following the named tag, attaching it to the context.
      *
@@ -253,7 +253,52 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config)
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config) {
+        return parse(x, context, name, config, null, 0, new JSONObject(), false);
+    }
+
+    /**
+     * Scan the content following the named tag, attaching it to the context, extract the sub object on the path.
+     *
+     * @param x
+     *            The XMLTokener containing the source string.
+     * @param context
+     *            The JSONObject that will include the new material.
+     * @param name
+     *            The tag name.
+     * @param path
+     *            The required key path to extract object
+     * @param pathIdx
+     *            The current recursive level
+     * @return true if the close tag is processed.
+     * @throws JSONException
+     */
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, String[] path, int pathIdx) {
+        return parse(x, context, name, config, path, pathIdx, new JSONObject(), false);
+    }
+
+    /**
+     * Scan the content following the named tag, attaching it to the context, replacing the object on the key path if
+     * it is reached.
+     *
+     * @param x
+     *            The XMLTokener containing the source string.
+     * @param context
+     *            The JSONObject that will include the new material.
+     * @param name
+     *            The tag name.
+     * @param path
+     *            The required key path to be replaced
+     * @param pathIdx
+     *            The current recursive level
+     * @param replacement
+     *            The new JSONObject for replacement
+     * @param isReplace
+     *            The flag to label if processing replacement
+     * @return true if the close tag is processed.
+     * @throws JSONException
+     */
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, String[] path, int pathIdx, JSONObject replacement, boolean isReplace)
             throws JSONException {
         char c;
         int i;
@@ -342,6 +387,19 @@ public class XML {
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
             xmlXsiTypeConverter = null;
+            // check path
+            if(path != null && !isReplace) {
+                if(pathIdx < path.length) {
+                    // skip tag that is not on the path
+                    if(!tagName.equals(path[pathIdx])) {
+                        x.skipPast(tagName);
+                        x.skipPast(">");
+                        return false;
+                    } else {
+                        pathIdx++;
+                    }
+                }
+            }
             for (;;) {
                 if (token == null) {
                     token = x.nextToken();
@@ -423,7 +481,25 @@ public class XML {
 
                         } else if (token == LT) {
                             // Nested element
-                            if (parse(x, jsonObject, tagName, config)) {
+                            if (parse(x, jsonObject, tagName, config, path, pathIdx, replacement, isReplace)) {
+                                // copy sub object
+                                if(path != null) {
+                                    if(isReplace) {
+                                        // replace jsonObject under the last tag of the path with replacement
+                                        if(tagName.equals(path[path.length - 1])){
+                                            jsonObject = replacement;
+                                        }
+                                    } else {
+                                        // when backtracking, copy jsonObject to context
+                                        if (pathIdx != path.length) {
+                                            JSONObject finalJsonObject = jsonObject;
+                                            jsonObject.keySet().forEach(key -> {
+                                                context.accumulate(key, finalJsonObject.opt(key));
+                                            });
+                                            return false;
+                                        }
+                                    }
+                                }
                                 if (config.getForceList().contains(tagName)) {
                                     // Force the value to be an array
                                     if (jsonObject.length() == 0) {
@@ -731,6 +807,44 @@ public class XML {
      */
     public static JSONObject toJSONObject(String string, XMLParserConfiguration config) throws JSONException {
         return toJSONObject(new StringReader(string), config);
+    }
+
+    /**
+     * @param reader The XML source reader.
+     * @param path A JSONPointer points to a certain key path
+     * @return A sub JSONObject under the key path containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path) throws JSONException {
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        String[] paths = path.toString().replaceFirst("^/", "").split("/");
+        while (x.more()) {
+            x.skipPast("<");
+            if(x.more()) {
+                parse(x, jo, null, XMLParserConfiguration.ORIGINAL, paths, 0);
+            }
+        }
+        return jo;
+    }
+
+    /**
+     * @param reader The XML source reader.
+     * @param path A JSONPointer points to a certain key path
+     * @return A JSONObject being replaced containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader, JSONPointer path, JSONObject replacement) throws JSONException {
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        String[] paths = path.toString().replaceFirst("^/", "").split("/");
+        while (x.more()) {
+            x.skipPast("<");
+            if(x.more()) {
+                parse(x, jo, null, XMLParserConfiguration.ORIGINAL, paths, 0, replacement, true);
+            }
+        }
+        return jo;
     }
 
     /**

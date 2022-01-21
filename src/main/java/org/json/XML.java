@@ -487,6 +487,9 @@ public class XML {
                                     if(isReplace) {
                                         // replace jsonObject under the last tag of the path with replacement
                                         if(tagName.equals(path[path.length - 1])){
+                                            replacement.accumulate(config.getcDataTagName(),
+                                                                    replacement.opt(path[path.length - 1]));
+                                            replacement.remove(path[path.length - 1]);
                                             jsonObject = replacement;
                                         }
                                     } else {

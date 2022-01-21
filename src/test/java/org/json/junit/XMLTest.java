@@ -1119,12 +1119,34 @@ public class XMLTest {
                 "  </address>\n" +
                 "</contact>";
 
-        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":{\"street\":\"Ave of the Arts\"}},\"name\":\"Crista Lopes\"}}";
+        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}";
 
         try {
             JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
-            //System.out.println("Given replacement: " + replacement);
             JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
+            Util.compareActualVsExpectedJsonObjects(jobj, new JSONObject(expectedString));
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void testToJSONObjectWithPathWithReplacement2() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "  </address>\n" +
+                "</contact>";
+
+        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92620,\"street\":\"Ave of Arts\"},\"name\":\"Crista Lopes\"}}";
+
+        try {
+            JSONObject replacement = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/"), replacement);
             Util.compareActualVsExpectedJsonObjects(jobj, new JSONObject(expectedString));
         } catch (JSONException e) {
             System.out.println(e);

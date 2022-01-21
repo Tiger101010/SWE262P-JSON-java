@@ -388,16 +388,26 @@ public class XML {
             boolean nilAttributeFound = false;
             xmlXsiTypeConverter = null;
             // check path
-            if(path != null && !isReplace) {
+            if(path != null) {
                 if(pathIdx < path.length) {
                     // skip tag that is not on the path
                     if(!tagName.equals(path[pathIdx])) {
-                        x.skipPast(tagName);
-                        x.skipPast(">");
-                        return false;
+                        if(!isReplace){
+                            x.skipPast(tagName);
+                            x.skipPast(">");
+                            return false;
+                        }
                     } else {
                         pathIdx++;
                     }
+                    // when doing replacement, skip tag under the replacing path
+                } else if(isReplace && pathIdx == path.length) {
+                    if(!replacement.keySet().contains(path[path.length - 1])) {
+                        throw new JSONException("Unable to find matching key to replace");
+                    }
+                    x.skipPast(tagName);
+                    x.skipPast(">");
+                    return false;
                 }
             }
             for (;;) {
@@ -484,6 +494,7 @@ public class XML {
                             if (parse(x, jsonObject, tagName, config, path, pathIdx, replacement, isReplace)) {
                                 // copy sub object
                                 if(path != null) {
+                                    // replacing
                                     if(isReplace) {
                                         // replace jsonObject under the last tag of the path with replacement
                                         if(tagName.equals(path[path.length - 1])){
@@ -492,6 +503,7 @@ public class XML {
                                             replacement.remove(path[path.length - 1]);
                                             jsonObject = replacement;
                                         }
+                                    // extract sub-object
                                     } else {
                                         // when backtracking, copy jsonObject to context
                                         if (pathIdx != path.length) {

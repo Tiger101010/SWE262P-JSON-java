@@ -1076,32 +1076,15 @@ public class XMLTest {
                 "    <street>Ave of Nowhere</street>\n" +
                 "  </address>\n" +
                 "</contact>";
-        String expectedString = "{\"street\":\"Ave of Nowhere\"}";
+        String expectedString1 = "{\"street\":\"Ave of Nowhere\"}";
+        String expectedString2 = "{\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"}}";
 
         try {
             JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street"));
-            assertEquals(jobj.toString(), expectedString);
-        } catch (JSONException e) {
-            System.out.println(e);
-        }
-    }
+            assertEquals(jobj.toString(), expectedString1);
 
-    @Test
-    public void testToJSONObjectWithPath2() {
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<contact>\n"+
-                "  <nick>Crista </nick>\n"+
-                "  <name>Crista Lopes</name>\n" +
-                "  <address>\n" +
-                "    <zipcode>92614</zipcode>\n" +
-                "    <street>Ave of Nowhere</street>\n" +
-                "  </address>\n" +
-                "</contact>";
-        String expectedString = "{\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"}}";
-
-        try {
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address"));
-            assertEquals(jobj.toString(), expectedString);
+            JSONObject jobj2 = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address"));
+            assertEquals(jobj2.toString(), expectedString2);
         } catch (JSONException e) {
             System.out.println(e);
         }
@@ -1119,43 +1102,7 @@ public class XMLTest {
                 "  </address>\n" +
                 "</contact>";
 
-        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}";
-
-        try {
-            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
-            assertEquals(jobj.toString(), expectedString);
-        } catch (JSONException e) {
-            System.out.println(e);
-        }
-    }
-
-    @Test
-    public void testToJSONObjectWithPathWithReplacement2() {
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
-                "<contact>\n"+
-                "  <nick>Crista </nick>\n"+
-                "  <name>Crista Lopes</name>\n" +
-                "  <address>\n" +
-                "    <street>Ave of Nowhere</street>\n" +
-                "    <zipcode>92614</zipcode>\n" +
-                "  </address>\n" +
-                "</contact>";
-
-        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92620,\"street\":\"Ave of Arts\"},\"name\":\"Crista Lopes\"}}";
-
-        try {
-            JSONObject replacement = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/"), replacement);
-            assertEquals(jobj.toString(), expectedString);
-        } catch (JSONException e) {
-            System.out.println(e);
-        }
-    }
-
-    @Test
-    public void testToJSONObjectWithPathWithReplacement3() {
-        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+        String xmlString3 = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
                 "<contact>\n"+
                 "  <nick>Crista </nick>\n"+
                 "  <name>Crista Lopes</name>\n" +
@@ -1169,14 +1116,25 @@ public class XMLTest {
                 "  </address2>\n" +
                 "</contact>";
 
-        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92620,\"street\":\"Ave of Arts\"},\"address2\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}";
+        String expectedString1 = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}";
+        String expectedString2 = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92620,\"street\":\"Ave of Arts\"},\"name\":\"Crista Lopes\"}}";
+        String expectedString3 = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92620,\"street\":\"Ave of Arts\"},\"address2\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}";
 
         try {
-            JSONObject replacement = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
-            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/"), replacement);
-            assertEquals(jobj.toString(), expectedString);
+            JSONObject replacement = XML.toJSONObject("<street>Ave of the Arts</street>\n");
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/street/"), replacement);
+            assertEquals(jobj.toString(), expectedString1);
+
+            JSONObject replacement2 = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
+            JSONObject jobj2 = XML.toJSONObject(new StringReader(xmlString), new JSONPointer("/contact/address/"), replacement2);
+            assertEquals(jobj2.toString(), expectedString2);
+
+            JSONObject replacement3 = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
+            JSONObject jobj3 = XML.toJSONObject(new StringReader(xmlString3), new JSONPointer("/contact/address/"), replacement3);
+            assertEquals(jobj3.toString(), expectedString3);
         } catch (JSONException e) {
             System.out.println(e);
         }
     }
+
 }

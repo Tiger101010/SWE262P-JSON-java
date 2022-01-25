@@ -1,3 +1,25 @@
+# Milestone 2
+## 1. Open Project
+- Open project in Intellij
+- Choose Maven to build the project
+## 2. Run
+### Open test file
+- Locate file at `src/test/java/org/json/junit/XMLTest.java`
+- Search for methods `testToJSONObjectWithPath`. It takes in charge of task 1
+- Search for methods `testToJSONObjectWithPathWithReplacement`. It's in charge of task2
+### Run test
+- Click run button next to method signature
+
+## 3. Notes
+notes that help to understand code
+
+1. To make best use of existing code, added logic is added to `parse` method;
+2. To keep the existing code untouched, `parse` method is overridden into 3 methods with different parameters;
+3. Use `skipPast` method to run faster;
+4. Unable to process JSONArray
+
+---
+
 ![Json-Java logo](https://github.com/stleary/JSON-java/blob/master/images/JsonJava.png?raw=true)
 
 <sub><sup>image credit: Ismael Pérez Ortiz</sup></sub>

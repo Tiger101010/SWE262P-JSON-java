@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.function.Function;
 
 
 /**
@@ -254,7 +255,7 @@ public class XML {
      * @throws JSONException
      */
     private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config) {
-        return parse(x, context, name, config, null, 0, new JSONObject(), false);
+        return parse(x, context, name, config, null, 0, new JSONObject(), false, null, false);
     }
 
     /**
@@ -274,7 +275,7 @@ public class XML {
      * @throws JSONException
      */
     private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, String[] path, int pathIdx) {
-        return parse(x, context, name, config, path, pathIdx, new JSONObject(), false);
+        return parse(x, context, name, config, path, pathIdx, new JSONObject(), false, null, false);
     }
 
     /**
@@ -298,7 +299,60 @@ public class XML {
      * @return true if the close tag is processed.
      * @throws JSONException
      */
-    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config, String[] path, int pathIdx, JSONObject replacement, boolean isReplace)
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config,
+                                 String[] path, int pathIdx, JSONObject replacement, boolean isReplace) {
+        return parse(x, context, name, config, path, pathIdx, replacement, isReplace, null, false);
+    }
+
+
+    /**
+     * Scan the content following the named tag, attaching it to the context, replacing the object on the key path if
+     * it is reached.
+     *
+     * @param x
+     *            The XMLTokener containing the source string.
+     * @param context
+     *            The JSONObject that will include the new material.
+     * @param name
+     *            The tag name.
+     * @param keyTransformer
+     *            The transformer to transfer key.
+     *
+     * @return true if the close tag is processed.
+     */
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config,
+                                 Function<String, String> keyTransformer) {
+        return parse(x, context, name, config, null, 0, null, false, keyTransformer, true);
+    }
+
+    /**
+     * Scan the content following the named tag, attaching it to the context, replacing the object on the key path if
+     * it is reached.
+     *
+     * @param x
+     *            The XMLTokener containing the source string.
+     * @param context
+     *            The JSONObject that will include the new material.
+     * @param name
+     *            The tag name.
+     * @param path
+     *            The required key path to be replaced
+     * @param pathIdx
+     *            The current recursive level
+     * @param replacement
+     *            The new JSONObject for replacement
+     * @param isReplace
+     *            The flag to label if processing replacement
+     * @param keyTransformer
+     *            The transformer to transfer key.
+     * @param isTransform
+     *            The flag to label if transforming key
+     * @return true if the close tag is processed.
+     * @throws JSONException
+     */
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config,
+                                 String[] path, int pathIdx, JSONObject replacement, boolean isReplace,
+                                 Function<String, String> keyTransformer, boolean isTransform)
             throws JSONException {
         char c;
         int i;
@@ -365,6 +419,12 @@ public class XML {
             // Close tag </
 
             token = x.nextToken();
+
+            // check if doing transforming, make a matching key
+            if(isTransform) {
+                token = keyTransformer.apply(token.toString());
+            }
+
             if (name == null) {
                 throw x.syntaxError("Mismatched close tag " + token);
             }
@@ -387,6 +447,12 @@ public class XML {
             jsonObject = new JSONObject();
             boolean nilAttributeFound = false;
             xmlXsiTypeConverter = null;
+
+            // key transform
+            if(isTransform) {
+                tagName = keyTransformer.apply(tagName);
+            }
+
             // check path
             if(path != null) {
                 if(pathIdx < path.length) {
@@ -491,7 +557,7 @@ public class XML {
 
                         } else if (token == LT) {
                             // Nested element
-                            if (parse(x, jsonObject, tagName, config, path, pathIdx, replacement, isReplace)) {
+                            if (parse(x, jsonObject, tagName, config, path, pathIdx, replacement, isReplace, keyTransformer, isTransform)) {
                                 // copy sub object
                                 if(path != null) {
                                     // replacing
@@ -857,6 +923,23 @@ public class XML {
             x.skipPast("<");
             if(x.more()) {
                 parse(x, jo, null, XMLParserConfiguration.ORIGINAL, paths, 0, replacement, true);
+            }
+        }
+        return jo;
+    }
+
+    /**
+     * @param reader The XML source reader.
+     * @return A JSONObject being replaced containing the structured data from the XML string.
+     * @throws JSONException Thrown if there is an errors while parsing the string
+     */
+    public static JSONObject toJSONObject(Reader reader, Function<String, String> keyTransformer) throws JSONException {
+        JSONObject jo = new JSONObject();
+        XMLTokener x = new XMLTokener(reader);
+        while (x.more()) {
+            x.skipPast("<");
+            if(x.more()) {
+                parse(x, jo, null, XMLParserConfiguration.ORIGINAL, keyTransformer);
             }
         }
         return jo;

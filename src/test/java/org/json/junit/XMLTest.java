@@ -40,6 +40,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.json.*;
@@ -1132,6 +1133,27 @@ public class XMLTest {
             JSONObject replacement3 = XML.toJSONObject("<address><street>Ave of Arts</street><zipcode>92620</zipcode></address>\n");
             JSONObject jobj3 = XML.toJSONObject(new StringReader(xmlString3), new JSONPointer("/contact/address/"), replacement3);
             assertEquals(jobj3.toString(), expectedString3);
+        } catch (JSONException e) {
+            System.out.println(e);
+        }
+    }
+
+    @Test
+    public void testToJSONObjectWithKeyTransformer() {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "  </address>\n" +
+                "</contact>";
+        String expectedString1 = "{\"CONTACT\":{\"NICK\":\"Crista\",\"ADDRESS\":{\"ZIPCODE\":92614,\"STREET\":\"Ave of Nowhere\"},\"NAME\":\"Crista Lopes\"}}";
+
+        try {
+            JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), String::toUpperCase);
+            assertEquals(jobj.toString(), expectedString1);
         } catch (JSONException e) {
             System.out.println(e);
         }

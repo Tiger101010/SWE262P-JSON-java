@@ -1,3 +1,43 @@
+# Milestone 3
+## 1. Open Project
+- Open project in Intellij
+- Choose Maven to build the project
+## 2. Run
+### Open test file
+- Locate file at `src/test/java/org/json/junit/XMLTest.java`
+- Search for methods `testToJSONObjectWithKeyTransformer`
+### Run test
+- Click run button next to method signature
+## 3. Notes
+
+### `parse`
+
+Wrap the parse method with fewer arguments for keyTransformer.
+```java
+    private static boolean parse(XMLTokener x, JSONObject context, String name, XMLParserConfiguration config,
+                                 Function<String, String> keyTransformer) {
+        return parse(x, context, name, config, null, 0, null, false, keyTransformer, true);
+    }
+```
+
+### `keyTransformer`
+**6-line logic for this milestone**
+
+Apply `keyTransformer` method to `tagName` to change the key.
+```java
+            // key transform
+            if(isTransform) {
+                tagName = keyTransformer.apply(tagName);
+            }
+```
+And apply the method to token at `else if (token == SLASH) ` block for close tag match.
+```java
+            // check if doing transforming, make a matching key
+            if(isTransform) {
+                token = keyTransformer.apply(token.toString());
+            }
+```
+---
 # Milestone 2
 ## 1. Open Project
 - Open project in Intellij

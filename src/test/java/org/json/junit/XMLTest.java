@@ -1150,10 +1150,15 @@ public class XMLTest {
                 "  </address>\n" +
                 "</contact>";
         String expectedString1 = "{\"CONTACT\":{\"NICK\":\"Crista\",\"ADDRESS\":{\"ZIPCODE\":92614,\"STREET\":\"Ave of Nowhere\"},\"NAME\":\"Crista Lopes\"}}";
-
+        String expectedString2 = "{\"swe262p_contact\":{\"swe262p_name\":\"Crista Lopes\",\"swe262p_address\":{\"swe262p_street\":\"Ave of Nowhere\",\"swe262p_zipcode\":92614},\"swe262p_nick\":\"Crista\"}}";
+        String expectedString3 = "{\"tcatnoc\":{\"eman\":\"Crista Lopes\",\"sserdda\":{\"edocpiz\":92614,\"teerts\":\"Ave of Nowhere\"},\"kcin\":\"Crista\"}}";
         try {
             JSONObject jobj = XML.toJSONObject(new StringReader(xmlString), String::toUpperCase);
+            JSONObject jobj2 = XML.toJSONObject(new StringReader(xmlString), str->str.replaceAll(".+", "swe262p_$0"));
+            JSONObject jobj3 = XML.toJSONObject(new StringReader(xmlString), str->new StringBuilder(str).reverse().toString());
             assertEquals(jobj.toString(), expectedString1);
+            assertEquals(jobj2.toString(), expectedString2);
+            assertEquals(jobj3.toString(), expectedString3);
         } catch (JSONException e) {
             System.out.println(e);
         }

@@ -23,6 +23,8 @@ Wrap the parse method with fewer arguments for keyTransformer.
 ### `keyTransformer`
 **6-line logic for this milestone**
 
+In the implementation, the **keyTransformer** logic allows key change during parse. Therefore, one traversal is enough, which provides a better performance. In addition, the code utilize the existing variable to save the changed name, which saves space cost.
+
 Apply `keyTransformer` method to `tagName` to change the key.
 ```java
             // key transform

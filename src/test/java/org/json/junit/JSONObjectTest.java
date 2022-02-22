@@ -3351,4 +3351,42 @@ public class JSONObjectTest {
         assertTrue("expected jsonObject.length() == 0", jsonObject.length() == 0); //Check if its length is 0
         jsonObject.getInt("key1"); //Should throws org.json.JSONException: JSONObject["asd"] not found
     }
+
+    @Test
+    public void jsonObjectToStreamTest() {
+        JSONObject jsonObject = new JSONObject("{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}");
+        JSONObject jsonObject1 = new JSONObject("{\"menu\": {\n" +
+                "  \"id\": \"file\",\n" +
+                "  \"value\": \"File\",\n" +
+                "  \"popup\": {\n" +
+                "    \"menuitem\": [\n" +
+                "      {\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"},\n" +
+                "      {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"},\n" +
+                "      {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}}");
+        JSONObject jsonObject2 = new JSONObject("{\"menu\": {\n" +
+                "  \"id\": \"file\",\n" +
+                "  \"value\": \"File\",\n" +
+                "  \"popup\": {\n" +
+                "    \"menuitem\": [\n" +
+                "[{\"a\": [{\"c\": 112}, {\"c\": 113},{\"c\": 114}],}, {\"a\": 13},{\"a\": 14}]," +
+                "[{\"b\": 22}, {\"b\": 23},{\"b\": 24}]," +
+                "    ]\n" +
+                "  }\n" +
+                "}}");
+
+        System.out.println("\n-------------------------\nTest On object without JSONArray\n-------------------------\n");
+        System.out.println(jsonObject.toString(4) + "\n--------------------------\n");
+        jsonObject.toStream().forEach(System.out::println);
+
+        System.out.println("\n-------------------------\nTest On object contains JSONArray\n-------------------------\n");
+        System.out.println(jsonObject1.toString(4) + "\n--------------------------\n");
+        jsonObject1.toStream().forEach(System.out::println);
+
+        System.out.println("\n-------------------------\nTest On Nested JSONArray\n-------------------------\n");
+        System.out.println(jsonObject2.toString(4) + "\n--------------------------\n");
+        jsonObject2.toStream().forEach(System.out::println);
+    }
 }

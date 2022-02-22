@@ -48,6 +48,7 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * A JSONObject is an unordered collection of name/value pairs. Its external
@@ -2721,5 +2722,57 @@ public class JSONObject {
         return new JSONException(
             "JavaBean object contains recursively defined member variable of key " + quote(key)
         );
+    }
+
+    /**
+     * Create a Stream of Object based on all nodes in JSONObject
+     * @param
+     * @return <code>Stream<Object></code>
+     */
+    public Stream<Object> toStream() {
+        return toStream(this);
+    }
+
+    /**
+     * Create a Stream of Object based on all nodes in Parameter passed in;
+     * Use DFS to traverse the JSONObject in pre-order
+     * @param obj An Object
+     * @return <code>Stream<Object></code> based on input obj
+     */
+    private Stream<Object> toStream(Object obj) {
+
+        Stream<Object> stream = Stream.empty();
+
+        if(obj instanceof JSONObject) {
+            for(String key : ((JSONObject) obj).keySet()) {
+                // Get value
+                Object value = ((JSONObject) obj).get(key);
+
+                // Save the key from last level
+                HashMap<String, Object> node = new HashMap<>();
+                node.put(key, value);
+
+                if (value instanceof JSONObject) {
+                    stream = Stream.concat(stream, Stream.of(new JSONObject(node)));
+                    stream = Stream.concat(stream, toStream(value));
+                } else if (value instanceof JSONArray) {
+                    // Iterate through JSONArray
+                    for (Object entry : (JSONArray) value) {
+                        stream = Stream.concat(stream, toStream(entry));
+                    }
+                } else {
+                    // If the value is not an JSONObject or JSONArray, it's a number or string
+                    // Save it as a new node with corresponding key
+                    stream = Stream.concat(stream, Stream.of(new JSONObject(node)));
+                }
+            }
+        } else if(obj instanceof JSONArray) {
+            // Process Nested JSONArray in pattern [[...],[...]]
+            for (Object entry : (JSONArray) obj) {
+                stream = Stream.concat(stream, toStream(entry));
+            }
+        }
+
+        return stream;
     }
 }

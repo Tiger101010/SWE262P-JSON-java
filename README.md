@@ -1,3 +1,21 @@
+# Milestone 4
+## 1. Open Project
+- Open project in Intellij
+- Choose Maven to build the project
+## 2. Run
+### Open test file
+- Locate file at `src/test/java/org/json/junit/JSONObjectTest.java`
+- Search for methods `jsonObjectToStreamTest`
+### Run test
+- Click run button next to method signature
+
+## 3. Notes
+- Use recursive DFS to traverse the JSONObject in pre-order
+- Process JSONArray and nested JSONArray
+- Use `Stream.concat()` to make an object streamable
+- In the output of test method `jsonObjectToStreamTest`, the result can be compared
+
+
 # Milestone 3
 ## 1. Open Project
 - Open project in Intellij

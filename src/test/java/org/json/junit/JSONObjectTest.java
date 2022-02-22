@@ -3379,14 +3379,48 @@ public class JSONObjectTest {
 
         System.out.println("\n-------------------------\nTest On object without JSONArray\n-------------------------\n");
         System.out.println(jsonObject.toString(4) + "\n--------------------------\n");
-        jsonObject.toStream().forEach(System.out::println);
+        StringBuilder result = new StringBuilder();
+        String expectedResult = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}\n" +
+                "{\"nick\":\"Crista\"}\n" +
+                "{\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"}}\n" +
+                "{\"zipcode\":92614}\n" +
+                "{\"street\":\"Ave of the Arts\"}\n" +
+                "{\"name\":\"Crista Lopes\"}\n";
+        jsonObject.toStream().forEach(node -> {result.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result.toString());
 
         System.out.println("\n-------------------------\nTest On object contains JSONArray\n-------------------------\n");
         System.out.println(jsonObject1.toString(4) + "\n--------------------------\n");
-        jsonObject1.toStream().forEach(System.out::println);
+        StringBuilder result1 = new StringBuilder();
+        expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]},\"id\":\"file\",\"value\":\"File\"}}\n" +
+                "{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]}}\n" +
+                "{\"onclick\":\"CreateNewDoc()\"}\n" +
+                "{\"value\":\"New\"}\n" +
+                "{\"onclick\":\"OpenDoc()\"}\n" +
+                "{\"value\":\"Open\"}\n" +
+                "{\"onclick\":\"CloseDoc()\"}\n" +
+                "{\"value\":\"Close\"}\n" +
+                "{\"id\":\"file\"}\n" +
+                "{\"value\":\"File\"}\n";
+        jsonObject1.toStream().forEach(node -> {result1.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result1.toString());
 
         System.out.println("\n-------------------------\nTest On Nested JSONArray\n-------------------------\n");
         System.out.println(jsonObject2.toString(4) + "\n--------------------------\n");
-        jsonObject2.toStream().forEach(System.out::println);
+        StringBuilder result2 = new StringBuilder();
+        expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]},\"id\":\"file\",\"value\":\"File\"}}\n" +
+                "{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]}}\n" +
+                "{\"c\":112}\n" +
+                "{\"c\":113}\n" +
+                "{\"c\":114}\n" +
+                "{\"a\":13}\n" +
+                "{\"a\":14}\n" +
+                "{\"b\":22}\n" +
+                "{\"b\":23}\n" +
+                "{\"b\":24}\n" +
+                "{\"id\":\"file\"}\n" +
+                "{\"value\":\"File\"}\n";
+        jsonObject2.toStream().forEach(node -> {result2.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result2.toString());
     }
 }

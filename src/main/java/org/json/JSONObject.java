@@ -2729,7 +2729,7 @@ public class JSONObject {
      * @param
      * @return <code>Stream<Object></code>
      */
-    public Stream<Object> toStream() {
+    public Stream<JSONObject> toStream() {
         return toStream(this);
     }
 
@@ -2739,9 +2739,9 @@ public class JSONObject {
      * @param obj An Object
      * @return <code>Stream<Object></code> based on input obj
      */
-    private Stream<Object> toStream(Object obj) {
+    private Stream<JSONObject> toStream(Object obj) {
 
-        Stream<Object> stream = Stream.empty();
+        Stream<JSONObject> stream = Stream.empty();
 
         if(obj instanceof JSONObject) {
             for(String key : ((JSONObject) obj).keySet()) {

@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.json.*;
 import org.junit.Rule;
@@ -1162,6 +1163,25 @@ public class XMLTest {
         } catch (JSONException e) {
             System.out.println(e);
         }
+    }
+
+    @Test
+    public void testToJSONObjectAsync() throws InterruptedException {
+        String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
+                "<contact>\n"+
+                "  <nick>Crista </nick>\n"+
+                "  <name>Crista Lopes</name>\n" +
+                "  <address>\n" +
+                "    <zipcode>92614</zipcode>\n" +
+                "    <street>Ave of Nowhere</street>\n" +
+                "  </address>\n" +
+                "</contact>";
+
+        XML.toJSONObject(new StringReader(xmlString), (jo) -> {
+                System.out.println("\nPrint from Asynchronous function\n--------------------\n" + jo); return null;},
+            (Exception e) -> {e.printStackTrace(); return null;});
+        System.out.println("This Line is executed after Asynchronous XML.toJSONObject");
+        Thread.sleep(500);
     }
 
 }

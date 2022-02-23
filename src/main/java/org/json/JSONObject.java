@@ -2725,7 +2725,7 @@ public class JSONObject {
     }
 
     /**
-     * Create a Stream of Object based on all nodes in JSONObject
+     * Create a Stream of Object based on all key-value pair in JSONObject
      * @param
      * @return <code>Stream<Object></code>
      */
@@ -2734,7 +2734,7 @@ public class JSONObject {
     }
 
     /**
-     * Create a Stream of Object based on all nodes in Parameter passed in;
+     * Create a Stream of Object based on all key-value pair in Parameter passed in;
      * Use DFS to traverse the JSONObject in pre-order
      * @param obj An Object
      * @return <code>Stream<Object></code> based on input obj
@@ -2756,6 +2756,7 @@ public class JSONObject {
                     stream = Stream.concat(stream, Stream.of(new JSONObject(node)));
                     stream = Stream.concat(stream, toStream(value));
                 } else if (value instanceof JSONArray) {
+                    stream = Stream.concat(stream, Stream.of(new JSONObject(node)));
                     // Iterate through JSONArray
                     for (Object entry : (JSONArray) value) {
                         stream = Stream.concat(stream, toStream(entry));

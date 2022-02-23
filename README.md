@@ -10,7 +10,7 @@
 - Click run button next to method signature
 
 ## 3. Notes
-- Use recursive DFS to traverse the JSONObject in pre-order
+- Use recursive DFS to traverse all the key-value pair in the JSONObject in pre-order
 - Process JSONArray and nested JSONArray
 - Use `Stream.concat()` to make an object streamable
 - In the output of test method `jsonObjectToStreamTest`, the result can be compared

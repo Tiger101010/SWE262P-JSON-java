@@ -2776,4 +2776,48 @@ public class JSONObject {
 
         return stream;
     }
+
+    /**
+     * Create a Stream of Object based on all sub-JSONObject in JSONObject
+     * @param
+     * @return <code>Stream<Object></code>
+     */
+    public Stream<JSONObject> toStream2() {
+        return toStream2(this);
+    }
+
+    /**
+     * Create a Stream of Object based on all sub-JSONObject in Parameter passed in;
+     * Use DFS to traverse the JSONObject in pre-order
+     * @param obj An Object
+     * @return <code>Stream<Object></code> based on input obj
+     */
+    private Stream<JSONObject> toStream2(Object obj) {
+
+        Stream<JSONObject> stream = Stream.empty();
+
+        if(obj instanceof JSONObject) {
+            stream = Stream.concat(stream, Stream.of((JSONObject) obj));
+            for(String key : ((JSONObject) obj).keySet()) {
+                // Get value
+                Object value = ((JSONObject) obj).get(key);
+
+                if (value instanceof JSONObject) {
+                    stream = Stream.concat(stream, toStream2(value));
+                } else if (value instanceof JSONArray) {
+                    // Iterate through JSONArray
+                    for (Object entry : (JSONArray) value) {
+                        stream = Stream.concat(stream, toStream2(entry));
+                    }
+                }
+            }
+        } else if(obj instanceof JSONArray) {
+            // Process Nested JSONArray in pattern [[...],[...]]
+            for (Object entry : (JSONArray) obj) {
+                stream = Stream.concat(stream, toStream2(entry));
+            }
+        }
+
+        return stream;
+    }
 }

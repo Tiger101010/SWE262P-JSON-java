@@ -3426,4 +3426,69 @@ public class JSONObjectTest {
         jsonObject2.toStream().forEach(node -> {result2.append(node.toString() + "\n"); System.out.println(node);});
         assertEquals(expectedResult, result2.toString());
     }
+
+    @Test
+    public void jsonObjectToStreamTest2() {
+        JSONObject jsonObject = new JSONObject("{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}");
+        JSONObject jsonObject1 = new JSONObject("{\"menu\": {\n" +
+                "  \"id\": \"file\",\n" +
+                "  \"value\": \"File\",\n" +
+                "  \"popup\": {\n" +
+                "    \"menuitem\": [\n" +
+                "      {\"value\": \"New\", \"onclick\": \"CreateNewDoc()\"},\n" +
+                "      {\"value\": \"Open\", \"onclick\": \"OpenDoc()\"},\n" +
+                "      {\"value\": \"Close\", \"onclick\": \"CloseDoc()\"}\n" +
+                "    ]\n" +
+                "  }\n" +
+                "}}");
+        JSONObject jsonObject2 = new JSONObject("{\"menu\": {\n" +
+                "  \"id\": \"file\",\n" +
+                "  \"value\": \"File\",\n" +
+                "  \"popup\": {\n" +
+                "    \"menuitem\": [\n" +
+                "[{\"a\": [{\"c\": 112}, {\"c\": 113},{\"c\": 114}],}, {\"a\": 13},{\"a\": 14}]," +
+                "[{\"b\": 22}, {\"b\": 23},{\"b\": 24}]," +
+                "    ]\n" +
+                "  }\n" +
+                "}}");
+
+        System.out.println("\n-------------------------\nTest On object without JSONArray\n-------------------------\n");
+        System.out.println(jsonObject.toString(4) + "\n--------------------------\n");
+        StringBuilder result = new StringBuilder();
+        String expectedResult = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}}\n" +
+                "{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of the Arts\"},\"name\":\"Crista Lopes\"}\n" +
+                "{\"zipcode\":92614,\"street\":\"Ave of the Arts\"}\n";
+        jsonObject.toStream2().forEach(node -> {result.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result.toString());
+
+        System.out.println("\n-------------------------\nTest On object contains JSONArray\n-------------------------\n");
+        System.out.println(jsonObject1.toString(4) + "\n--------------------------\n");
+        StringBuilder result1 = new StringBuilder();
+        expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]},\"id\":\"file\",\"value\":\"File\"}}\n" +
+                "{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]},\"id\":\"file\",\"value\":\"File\"}\n" +
+                "{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]}\n" +
+                "{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"}\n" +
+                "{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"}\n" +
+                "{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}\n";
+        jsonObject1.toStream2().forEach(node -> {result1.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result1.toString());
+
+        System.out.println("\n-------------------------\nTest On Nested JSONArray\n-------------------------\n");
+        System.out.println(jsonObject2.toString(4) + "\n--------------------------\n");
+        StringBuilder result2 = new StringBuilder();
+        expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]},\"id\":\"file\",\"value\":\"File\"}}\n" +
+                "{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]},\"id\":\"file\",\"value\":\"File\"}\n" +
+                "{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]}\n" +
+                "{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]}\n" +
+                "{\"c\":112}\n" +
+                "{\"c\":113}\n" +
+                "{\"c\":114}\n" +
+                "{\"a\":13}\n" +
+                "{\"a\":14}\n" +
+                "{\"b\":22}\n" +
+                "{\"b\":23}\n" +
+                "{\"b\":24}\n";
+        jsonObject2.toStream2().forEach(node -> {result2.append(node.toString() + "\n"); System.out.println(node);});
+        assertEquals(expectedResult, result2.toString());
+    }
 }

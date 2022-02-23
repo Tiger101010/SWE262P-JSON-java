@@ -3394,6 +3394,7 @@ public class JSONObjectTest {
         StringBuilder result1 = new StringBuilder();
         expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]},\"id\":\"file\",\"value\":\"File\"}}\n" +
                 "{\"popup\":{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]}}\n" +
+                "{\"menuitem\":[{\"onclick\":\"CreateNewDoc()\",\"value\":\"New\"},{\"onclick\":\"OpenDoc()\",\"value\":\"Open\"},{\"onclick\":\"CloseDoc()\",\"value\":\"Close\"}]}\n" +
                 "{\"onclick\":\"CreateNewDoc()\"}\n" +
                 "{\"value\":\"New\"}\n" +
                 "{\"onclick\":\"OpenDoc()\"}\n" +
@@ -3410,6 +3411,8 @@ public class JSONObjectTest {
         StringBuilder result2 = new StringBuilder();
         expectedResult = "{\"menu\":{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]},\"id\":\"file\",\"value\":\"File\"}}\n" +
                 "{\"popup\":{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]}}\n" +
+                "{\"menuitem\":[[{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]},{\"a\":13},{\"a\":14}],[{\"b\":22},{\"b\":23},{\"b\":24}]]}\n" +
+                "{\"a\":[{\"c\":112},{\"c\":113},{\"c\":114}]}\n" +
                 "{\"c\":112}\n" +
                 "{\"c\":113}\n" +
                 "{\"c\":114}\n" +

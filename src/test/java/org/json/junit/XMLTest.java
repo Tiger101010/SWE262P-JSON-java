@@ -42,6 +42,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.json.*;
@@ -1166,7 +1167,7 @@ public class XMLTest {
     }
 
     @Test
-    public void testToJSONObjectAsync() throws InterruptedException {
+    public void testToJSONObjectAsync() {
         String xmlString = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"+
                 "<contact>\n"+
                 "  <nick>Crista </nick>\n"+
@@ -1176,12 +1177,21 @@ public class XMLTest {
                 "    <street>Ave of Nowhere</street>\n" +
                 "  </address>\n" +
                 "</contact>";
+        String expectedString = "{\"contact\":{\"nick\":\"Crista\",\"address\":{\"zipcode\":92614,\"street\":\"Ave of Nowhere\"},\"name\":\"Crista Lopes\"}}";
 
-        XML.toJSONObject(new StringReader(xmlString), (jo) -> {
-                System.out.println("\nPrint from Asynchronous function\n--------------------\n" + jo); return null;},
-            (Exception e) -> {e.printStackTrace(); return null;});
-        System.out.println("This Line is executed after Asynchronous XML.toJSONObject");
-        Thread.sleep(500);
+        CompletableFuture<JSONObject> completableFuture = XML.toJSONObjectAsync(new StringReader(xmlString));
+        completableFuture.thenAccept((jsonObject) -> {
+            System.out.println("Inside Async");
+            assertEquals(expectedString, jsonObject.toString());
+        });
+
+        System.out.println("After Async");
+        // catch exception
+        try{
+            completableFuture.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

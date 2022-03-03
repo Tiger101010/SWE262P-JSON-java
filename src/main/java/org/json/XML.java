@@ -949,16 +949,9 @@ public class XML {
     /**
      * An asynchronous function, which need a function passed in to process the result JSONObject
      * @param reader The XML source reader without blocking
-     * @param function a function that process JSONObject Asynchronously
-     * @param exceptionHandler an exception handler
      */
-    public static void toJSONObject(Reader reader, Function<JSONObject, Void> function, Function<Exception, Void> exceptionHandler) {
-        try{
-            CompletableFuture<JSONObject> completableFuture = CompletableFuture.supplyAsync(() -> toJSONObject(reader));
-            completableFuture.thenAcceptAsync(function::apply);
-        } catch (Exception e) {
-            exceptionHandler.apply(e);
-        }
+    public static CompletableFuture<JSONObject> toJSONObjectAsync(Reader reader) {
+        return CompletableFuture.supplyAsync(() -> toJSONObject(reader));
     }
 
     /**
